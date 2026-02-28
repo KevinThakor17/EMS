@@ -1,0 +1,61 @@
+services:
+  db:
+    image: mariadb:11.4
+    container_name: ems_db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: employee_management
+    volumes:
+      - ems_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+    container_name: ems_backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: mysql+pymysql://root:root@db:3306/employee_management
+      SECRET_KEY: super-secret-key-change-this
+      ALGORITHM: HS256
+      TOKEN_EXPIRE_MINUTES: 480
+      FALLBACK_DATABASE_URL: sqlite:///./ems_local.db
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: http://localhost:8000
+    container_name: ems_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+  phpmyadmin:
+    image: phpmyadmin:5-apache
+    container_name: ems_phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - "8080:80"
+
+volumes:
+  ems_db_data:

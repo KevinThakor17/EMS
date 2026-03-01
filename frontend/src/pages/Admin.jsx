@@ -45,14 +45,10 @@ export default function Admin() {
   };
 
   useEffect(() => {
-    if (isAdmin) {
-      loadData();
-    }
+    if (isAdmin) loadData();
   }, [isAdmin]);
 
-  if (!isAdmin) {
-    return <p className="text-sm text-rose-600">Admin access required.</p>;
-  }
+  if (!isAdmin) return <div className="alert alert-danger">Admin access required.</div>;
 
   const updateEmployeeField = (id, field, value) => {
     setEmployees((prev) => prev.map((emp) => (emp.id === id ? { ...emp, [field]: value } : emp)));
@@ -72,10 +68,7 @@ export default function Admin() {
   };
 
   const createEmployee = async () => {
-    const payload = {
-      ...newEmployee,
-      manager_id: newEmployee.manager_id === "" ? null : Number(newEmployee.manager_id),
-    };
+    const payload = { ...newEmployee, manager_id: newEmployee.manager_id === "" ? null : Number(newEmployee.manager_id) };
     await api.post("/ems/admin/employees", payload);
     setNewEmployee(EMPTY_EMPLOYEE);
     await loadData();
@@ -102,118 +95,76 @@ export default function Admin() {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-semibold">Admin Management</h2>
-        <p className="text-sm text-slate-600">Manage employees, team hierarchy, projects, and employee leave requests.</p>
-        {loading ? <p className="mt-2 text-sm text-slate-500">Loading...</p> : null}
-        {error ? <p className="mt-2 text-sm text-rose-600">{error}</p> : null}
+    <div>
+      <h2 className="h4 mb-1">Admin Console</h2>
+      <p className="text-muted">Manage employees, assignments, and leave operations.</p>
+      {loading ? <div className="alert alert-info py-2">Loading...</div> : null}
+      {error ? <div className="alert alert-danger py-2">{error}</div> : null}
+
+      <div className="card mb-3">
+        <div className="card-header">Add Employee</div>
+        <div className="card-body">
+          <div className="row g-2 align-items-end">
+            <div className="col-12 col-md-3"><label className="form-label">Name</label><input className="form-control" value={newEmployee.full_name} onChange={(e) => setNewEmployee({ ...newEmployee, full_name: e.target.value })} /></div>
+            <div className="col-12 col-md-3"><label className="form-label">Email</label><input className="form-control" value={newEmployee.email} onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })} /></div>
+            <div className="col-12 col-md-2"><label className="form-label">Password</label><input type="password" className="form-control" value={newEmployee.password} onChange={(e) => setNewEmployee({ ...newEmployee, password: e.target.value })} /></div>
+            <div className="col-6 col-md-2"><label className="form-label">Title</label><input className="form-control" value={newEmployee.title} onChange={(e) => setNewEmployee({ ...newEmployee, title: e.target.value })} /></div>
+            <div className="col-6 col-md-2"><label className="form-label">Department</label><input className="form-control" value={newEmployee.department} onChange={(e) => setNewEmployee({ ...newEmployee, department: e.target.value })} /></div>
+            <div className="col-6 col-md-2"><label className="form-label">Role</label><select className="form-select" value={newEmployee.role} onChange={(e) => setNewEmployee({ ...newEmployee, role: e.target.value })}><option value="employee">employee</option><option value="manager">manager</option><option value="admin">admin</option></select></div>
+            <div className="col-6 col-md-3"><label className="form-label">Manager</label><select className="form-select" value={newEmployee.manager_id} onChange={(e) => setNewEmployee({ ...newEmployee, manager_id: e.target.value })}><option value="">No manager</option>{managerOptions.map((m) => <option key={m.id} value={m.id}>{m.full_name}</option>)}</select></div>
+            <div className="col-12 col-md-2"><button className="btn btn-primary w-100" onClick={createEmployee}>Create</button></div>
+          </div>
+        </div>
       </div>
 
-      <section className="rounded-xl border border-slate-200 p-4">
-        <h3 className="font-semibold">Add Employee</h3>
-        <div className="mt-3 grid gap-2 sm:grid-cols-4">
-          <input className="rounded border px-3 py-2" placeholder="Name" value={newEmployee.full_name} onChange={(e) => setNewEmployee({ ...newEmployee, full_name: e.target.value })} />
-          <input className="rounded border px-3 py-2" placeholder="Email" value={newEmployee.email} onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })} />
-          <input className="rounded border px-3 py-2" type="password" placeholder="Password" value={newEmployee.password} onChange={(e) => setNewEmployee({ ...newEmployee, password: e.target.value })} />
-          <input className="rounded border px-3 py-2" placeholder="Title" value={newEmployee.title} onChange={(e) => setNewEmployee({ ...newEmployee, title: e.target.value })} />
-          <input className="rounded border px-3 py-2" placeholder="Department" value={newEmployee.department} onChange={(e) => setNewEmployee({ ...newEmployee, department: e.target.value })} />
-          <select className="rounded border px-3 py-2" value={newEmployee.role} onChange={(e) => setNewEmployee({ ...newEmployee, role: e.target.value })}>
-            <option value="employee">employee</option>
-            <option value="manager">manager</option>
-            <option value="admin">admin</option>
-          </select>
-          <select className="rounded border px-3 py-2" value={newEmployee.manager_id} onChange={(e) => setNewEmployee({ ...newEmployee, manager_id: e.target.value })}>
-            <option value="">No manager</option>
-            {managerOptions.map((m) => <option key={m.id} value={m.id}>{m.full_name}</option>)}
-          </select>
-          <button className="rounded bg-cyan-600 px-3 py-2 text-white" onClick={createEmployee}>Create Employee</button>
-        </div>
-      </section>
-
-      <section className="rounded-xl border border-slate-200 p-4">
-        <h3 className="font-semibold">Employees</h3>
-        <div className="mt-3 overflow-auto">
-          <table className="min-w-full text-sm">
-            <thead className="bg-slate-50">
-              <tr>
-                <th className="px-2 py-2 text-left">Name</th>
-                <th className="px-2 py-2 text-left">Email</th>
-                <th className="px-2 py-2 text-left">Title</th>
-                <th className="px-2 py-2 text-left">Department</th>
-                <th className="px-2 py-2 text-left">Role</th>
-                <th className="px-2 py-2 text-left">Manager</th>
-                <th className="px-2 py-2 text-left">Active</th>
-                <th className="px-2 py-2 text-left">Action</th>
-              </tr>
-            </thead>
+      <div className="card mb-3">
+        <div className="card-header">Employees</div>
+        <div className="table-responsive">
+          <table className="table table-hover mb-0">
+            <thead className="table-light"><tr><th>Name</th><th>Email</th><th>Title</th><th>Department</th><th>Role</th><th>Manager</th><th>Active</th><th>Action</th></tr></thead>
             <tbody>
               {employees.map((emp) => (
-                <tr key={emp.id} className="border-t border-slate-200">
-                  <td className="px-2 py-2"><input className="w-40 rounded border px-2 py-1" value={emp.full_name} onChange={(e) => updateEmployeeField(emp.id, "full_name", e.target.value)} /></td>
-                  <td className="px-2 py-2">{emp.email}</td>
-                  <td className="px-2 py-2"><input className="w-32 rounded border px-2 py-1" value={emp.title} onChange={(e) => updateEmployeeField(emp.id, "title", e.target.value)} /></td>
-                  <td className="px-2 py-2"><input className="w-32 rounded border px-2 py-1" value={emp.department} onChange={(e) => updateEmployeeField(emp.id, "department", e.target.value)} /></td>
-                  <td className="px-2 py-2">
-                    <select className="rounded border px-2 py-1" value={emp.role} onChange={(e) => updateEmployeeField(emp.id, "role", e.target.value)}>
-                      <option value="employee">employee</option>
-                      <option value="manager">manager</option>
-                      <option value="admin">admin</option>
-                    </select>
-                  </td>
-                  <td className="px-2 py-2">
-                    <select className="rounded border px-2 py-1" value={emp.manager_id ?? ""} onChange={(e) => updateEmployeeField(emp.id, "manager_id", e.target.value === "" ? "" : Number(e.target.value))}>
-                      <option value="">None</option>
-                      {managerOptions.filter((m) => m.id !== emp.id).map((m) => <option key={m.id} value={m.id}>{m.full_name}</option>)}
-                    </select>
-                  </td>
-                  <td className="px-2 py-2">
-                    <input type="checkbox" checked={Boolean(emp.is_active)} onChange={(e) => updateEmployeeField(emp.id, "is_active", e.target.checked)} />
-                  </td>
-                  <td className="px-2 py-2">
-                    <button className="rounded bg-emerald-600 px-2 py-1 text-white" onClick={() => saveEmployee(emp)}>Save</button>
-                  </td>
+                <tr key={emp.id}>
+                  <td><input className="form-control form-control-sm" value={emp.full_name} onChange={(e) => updateEmployeeField(emp.id, "full_name", e.target.value)} /></td>
+                  <td>{emp.email}</td>
+                  <td><input className="form-control form-control-sm" value={emp.title} onChange={(e) => updateEmployeeField(emp.id, "title", e.target.value)} /></td>
+                  <td><input className="form-control form-control-sm" value={emp.department} onChange={(e) => updateEmployeeField(emp.id, "department", e.target.value)} /></td>
+                  <td><select className="form-select form-select-sm" value={emp.role} onChange={(e) => updateEmployeeField(emp.id, "role", e.target.value)}><option value="employee">employee</option><option value="manager">manager</option><option value="admin">admin</option></select></td>
+                  <td><select className="form-select form-select-sm" value={emp.manager_id ?? ""} onChange={(e) => updateEmployeeField(emp.id, "manager_id", e.target.value === "" ? "" : Number(e.target.value))}><option value="">None</option>{managerOptions.filter((m) => m.id !== emp.id).map((m) => <option key={m.id} value={m.id}>{m.full_name}</option>)}</select></td>
+                  <td><input className="form-check-input" type="checkbox" checked={Boolean(emp.is_active)} onChange={(e) => updateEmployeeField(emp.id, "is_active", e.target.checked)} /></td>
+                  <td><button className="btn btn-sm btn-outline-success" onClick={() => saveEmployee(emp)}>Save</button></td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      </section>
+      </div>
 
-      <section className="rounded-xl border border-slate-200 p-4">
-        <h3 className="font-semibold">Assign Employee To Project</h3>
-        <div className="mt-3 grid gap-2 sm:grid-cols-4">
-          <select className="rounded border px-3 py-2" value={assignment.project_id} onChange={(e) => setAssignment({ ...assignment, project_id: e.target.value })}>
-            <option value="">Select project</option>
-            {projects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-          </select>
-          <select className="rounded border px-3 py-2" value={assignment.employee_id} onChange={(e) => setAssignment({ ...assignment, employee_id: e.target.value })}>
-            <option value="">Select employee</option>
-            {employees.map((e) => <option key={e.id} value={e.id}>{e.full_name}</option>)}
-          </select>
-          <input className="rounded border px-3 py-2" type="number" min="1" max="100" value={assignment.allocation_percent} onChange={(e) => setAssignment({ ...assignment, allocation_percent: e.target.value })} />
-          <button className="rounded bg-cyan-600 px-3 py-2 text-white" onClick={assignProjectMember}>Assign Member</button>
+      <div className="card mb-3">
+        <div className="card-header">Assign Employee To Project</div>
+        <div className="card-body">
+          <div className="row g-2 align-items-end">
+            <div className="col-12 col-md-4"><label className="form-label">Project</label><select className="form-select" value={assignment.project_id} onChange={(e) => setAssignment({ ...assignment, project_id: e.target.value })}><option value="">Select project</option>{projects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></div>
+            <div className="col-12 col-md-4"><label className="form-label">Employee</label><select className="form-select" value={assignment.employee_id} onChange={(e) => setAssignment({ ...assignment, employee_id: e.target.value })}><option value="">Select employee</option>{employees.map((e) => <option key={e.id} value={e.id}>{e.full_name}</option>)}</select></div>
+            <div className="col-6 col-md-2"><label className="form-label">Allocation %</label><input type="number" min="1" max="100" className="form-control" value={assignment.allocation_percent} onChange={(e) => setAssignment({ ...assignment, allocation_percent: e.target.value })} /></div>
+            <div className="col-6 col-md-2"><button className="btn btn-primary w-100" onClick={assignProjectMember}>Assign</button></div>
+          </div>
         </div>
-      </section>
+      </div>
 
-      <section className="rounded-xl border border-slate-200 p-4">
-        <h3 className="font-semibold">Create Leave For Employee</h3>
-        <div className="mt-3 grid gap-2 sm:grid-cols-5">
-          <select className="rounded border px-3 py-2" value={adminLeave.employee_id} onChange={(e) => setAdminLeave({ ...adminLeave, employee_id: e.target.value })}>
-            <option value="">Select employee</option>
-            {employees.map((e) => <option key={e.id} value={e.id}>{e.full_name}</option>)}
-          </select>
-          <input className="rounded border px-3 py-2" placeholder="Reason" value={adminLeave.reason} onChange={(e) => setAdminLeave({ ...adminLeave, reason: e.target.value })} />
-          <input className="rounded border px-3 py-2" type="date" value={adminLeave.start_date} onChange={(e) => setAdminLeave({ ...adminLeave, start_date: e.target.value })} />
-          <input className="rounded border px-3 py-2" type="date" value={adminLeave.end_date} onChange={(e) => setAdminLeave({ ...adminLeave, end_date: e.target.value })} />
-          <select className="rounded border px-3 py-2" value={adminLeave.status} onChange={(e) => setAdminLeave({ ...adminLeave, status: e.target.value })}>
-            <option value="approved">approved</option>
-            <option value="pending">pending</option>
-            <option value="rejected">rejected</option>
-          </select>
-          <button className="rounded bg-cyan-600 px-3 py-2 text-white sm:col-span-5" onClick={createLeaveForEmployee}>Create Leave</button>
+      <div className="card">
+        <div className="card-header">Create Leave For Employee</div>
+        <div className="card-body">
+          <div className="row g-2 align-items-end">
+            <div className="col-12 col-md-3"><label className="form-label">Employee</label><select className="form-select" value={adminLeave.employee_id} onChange={(e) => setAdminLeave({ ...adminLeave, employee_id: e.target.value })}><option value="">Select employee</option>{employees.map((e) => <option key={e.id} value={e.id}>{e.full_name}</option>)}</select></div>
+            <div className="col-12 col-md-3"><label className="form-label">Reason</label><input className="form-control" value={adminLeave.reason} onChange={(e) => setAdminLeave({ ...adminLeave, reason: e.target.value })} /></div>
+            <div className="col-6 col-md-2"><label className="form-label">Start</label><input type="date" className="form-control" value={adminLeave.start_date} onChange={(e) => setAdminLeave({ ...adminLeave, start_date: e.target.value })} /></div>
+            <div className="col-6 col-md-2"><label className="form-label">End</label><input type="date" className="form-control" value={adminLeave.end_date} onChange={(e) => setAdminLeave({ ...adminLeave, end_date: e.target.value })} /></div>
+            <div className="col-6 col-md-1"><label className="form-label">Status</label><select className="form-select" value={adminLeave.status} onChange={(e) => setAdminLeave({ ...adminLeave, status: e.target.value })}><option value="approved">approved</option><option value="pending">pending</option><option value="rejected">rejected</option></select></div>
+            <div className="col-6 col-md-1"><button className="btn btn-primary w-100" onClick={createLeaveForEmployee}>Create</button></div>
+          </div>
         </div>
-      </section>
+      </div>
     </div>
   );
 }

@@ -10,15 +10,21 @@ export default function Team() {
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold">Team View</h2>
-      {rows.length === 0 ? <p className="mt-4 text-sm text-slate-600">No team members assigned or manager access required.</p> : null}
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <h2 className="h4 mb-1">Team Directory</h2>
+      <p className="text-muted">View colleagues by reporting structure and department.</p>
+
+      {rows.length === 0 ? <div className="alert alert-secondary">No team members assigned or manager access required.</div> : null}
+      <div className="row g-3">
         {rows.map((member) => (
-          <div key={member.id} className="rounded-xl border border-slate-200 p-4">
-            <h3 className="font-semibold">{member.name}</h3>
-            <p className="text-sm text-slate-600">{member.title}</p>
-            <p className="text-sm text-slate-500">{member.department}</p>
-            <p className="text-xs text-slate-500">Manager: {member.manager || "Unassigned"}</p>
+          <div key={member.id} className="col-12 col-md-6 col-xl-4">
+            <div className="card h-100">
+              <div className="card-body">
+                <h5 className="card-title mb-1">{member.name}</h5>
+                <p className="mb-1 fw-semibold">{member.title}</p>
+                <p className="text-muted mb-2">{member.department}</p>
+                <small className="text-secondary">Manager: {member.manager || "Unassigned"}</small>
+              </div>
+            </div>
           </div>
         ))}
       </div>

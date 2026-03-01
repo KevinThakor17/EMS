@@ -22,29 +22,31 @@ export default function Attendance() {
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold">Attendance</h2>
-      <div className="mt-4 flex gap-2">
-        <button className="rounded-lg bg-emerald-600 px-4 py-2 text-white" onClick={markCheckIn}>Check In</button>
-        <button className="rounded-lg bg-amber-600 px-4 py-2 text-white" onClick={markCheckOut}>Check Out</button>
+      <h2 className="h4 mb-1">Attendance</h2>
+      <p className="text-muted">Track check-in and check-out with daily logs.</p>
+
+      <div className="d-flex gap-2 mb-3">
+        <button className="btn btn-success" onClick={markCheckIn}>Check In</button>
+        <button className="btn btn-warning" onClick={markCheckOut}>Check Out</button>
       </div>
 
-      <div className="mt-4 overflow-auto rounded-xl border border-slate-200">
-        <table className="min-w-full text-sm">
-          <thead className="bg-slate-50">
+      <div className="table-responsive border rounded">
+        <table className="table table-striped table-hover mb-0">
+          <thead className="table-light">
             <tr>
-              <th className="px-3 py-2 text-left">Date</th>
-              <th className="px-3 py-2 text-left">Status</th>
-              <th className="px-3 py-2 text-left">Check In</th>
-              <th className="px-3 py-2 text-left">Check Out</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Check In</th>
+              <th>Check Out</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
-              <tr key={row.id} className="border-t border-slate-200">
-                <td className="px-3 py-2">{row.work_date}</td>
-                <td className="px-3 py-2 capitalize">{row.status}</td>
-                <td className="px-3 py-2">{row.check_in || "-"}</td>
-                <td className="px-3 py-2">{row.check_out || "-"}</td>
+              <tr key={row.id}>
+                <td>{row.work_date}</td>
+                <td className="text-capitalize">{row.status}</td>
+                <td>{row.check_in || "-"}</td>
+                <td>{row.check_out || "-"}</td>
               </tr>
             ))}
           </tbody>

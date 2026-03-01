@@ -24,43 +24,117 @@ export default function Layout() {
     navigate("/");
   };
 
+  const closeMobileMenu = () => {
+    const menu = document.getElementById("mobileMenu");
+    if (!menu) return;
+
+    const bs = window.bootstrap;
+    if (bs?.Offcanvas) {
+      const instance = bs.Offcanvas.getInstance(menu) || new bs.Offcanvas(menu);
+      instance.hide();
+      return;
+    }
+
+    menu.classList.remove("show");
+    document.body.classList.remove("offcanvas-backdrop");
+  };
+
+  const mobileNavigate = (to) => {
+    navigate(to);
+    closeMobileMenu();
+  };
+
+  const renderNav = (isMobile = false) => (
+    <>
+      <div className="list-group list-group-flush mb-3">
+        {navItems.map((item) => (
+          isMobile ? (
+            <button
+              key={item.to}
+              type="button"
+              className={`list-group-item list-group-item-action border-0 rounded mb-1 ${location.pathname === item.to ? "active" : ""}`}
+              onClick={() => mobileNavigate(item.to)}
+            >
+              {item.label}
+            </button>
+          ) : (
+            <Link
+              key={item.to}
+              to={item.to}
+              className={`list-group-item list-group-item-action border-0 rounded mb-1 ${location.pathname === item.to ? "active" : ""}`}
+            >
+              {item.label}
+            </Link>
+          )
+        ))}
+      </div>
+
+      <div className="border rounded p-3 bg-light mb-3">
+        <div className="fw-semibold">{employee?.full_name || "Employee"}</div>
+        <div className="text-muted small">{employee?.title || ""}</div>
+        <span className="badge text-bg-secondary mt-2 text-capitalize">{employee?.role || "user"}</span>
+      </div>
+
+      <button className="btn btn-outline-danger mt-auto" onClick={logout}>
+        Logout
+      </button>
+    </>
+  );
+
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900">
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 px-4 py-4 md:grid-cols-[240px_1fr]">
-        <aside className="rounded-2xl bg-slate-900 p-4 text-slate-100 shadow-lg">
-          <h1 className="text-xl font-bold">EMS</h1>
-          <p className="mt-1 text-sm text-slate-300">Employee Management</p>
-
-          <div className="mt-6 space-y-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={`block rounded-lg px-3 py-2 text-sm transition ${
-                  location.pathname === item.to ? "bg-cyan-500 text-white" : "hover:bg-slate-700"
-                }`}
+    <div className="bg-light min-vh-100">
+      <div className="container-fluid py-3">
+        <div className="d-lg-none mb-3">
+          <div className="card shadow-sm border-0">
+            <div className="card-body d-flex justify-content-between align-items-center py-2">
+              <div>
+                <h6 className="mb-0">EMS Workspace</h6>
+                <small className="text-muted">Operations Console</small>
+              </div>
+              <button
+                className="btn btn-outline-primary"
+                type="button"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#mobileMenu"
+                aria-controls="mobileMenu"
               >
-                {item.label}
-              </Link>
-            ))}
+                Menu
+              </button>
+            </div>
           </div>
+        </div>
 
-          <div className="mt-8 rounded-lg bg-slate-800 p-3 text-sm">
-            <div className="font-semibold">{employee?.full_name || "Employee"}</div>
-            <div className="text-slate-300">{employee?.title || ""}</div>
+        <div className="offcanvas offcanvas-start d-lg-none" tabIndex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
+          <div className="offcanvas-header">
+            <h5 className="offcanvas-title" id="mobileMenuLabel">Navigation</h5>
+            <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
           </div>
+          <div className="offcanvas-body d-flex flex-column">
+            {renderNav(true)}
+          </div>
+        </div>
 
-          <button
-            className="mt-4 w-full rounded-lg bg-rose-500 px-3 py-2 text-sm font-medium text-white hover:bg-rose-600"
-            onClick={logout}
-          >
-            Logout
-          </button>
-        </aside>
+        <div className="row g-3">
+          <aside className="d-none d-lg-block col-lg-3 col-xl-2">
+            <div className="card shadow-sm border-0 h-100">
+              <div className="card-header bg-primary text-white">
+                <h5 className="mb-0">EMS Workspace</h5>
+                <small className="opacity-75">Operations Console</small>
+              </div>
+              <div className="card-body d-flex flex-column">
+                {renderNav()}
+              </div>
+            </div>
+          </aside>
 
-        <main className="rounded-2xl bg-white p-5 shadow-sm">
-          <Outlet />
-        </main>
+          <main className="col-12 col-lg-9 col-xl-10">
+            <div className="card shadow-sm border-0">
+              <div className="card-body p-3 p-md-4">
+                <Outlet />
+              </div>
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   );

@@ -2,6 +2,12 @@ import React, { useEffect, useState } from "react";
 import { api } from "../lib/api";
 import { readEmployee } from "../lib/auth";
 
+const statusBadge = (status) => {
+  if (status === "approved") return "badge text-bg-success";
+  if (status === "rejected") return "badge text-bg-danger";
+  return "badge text-bg-warning";
+};
+
 export default function Leaves() {
   const current = readEmployee();
   const isAdmin = current?.role === "admin";
@@ -39,32 +45,29 @@ export default function Leaves() {
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold">Leave Management</h2>
+      <h2 className="h4 mb-1">Leave Management</h2>
+      <p className="text-muted">Apply leave, track status, and review approvals.</p>
 
-      <div className="mt-4 grid gap-2 rounded-xl border border-slate-200 p-4 sm:grid-cols-4">
-        <input className="rounded border px-3 py-2" placeholder="Reason" value={reason} onChange={(e) => setReason(e.target.value)} />
-        <input className="rounded border px-3 py-2" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-        <input className="rounded border px-3 py-2" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-        <button className="rounded bg-cyan-600 px-3 py-2 text-white" onClick={apply}>Apply Leave</button>
+      <div className="card mb-3">
+        <div className="card-body">
+          <div className="row g-2 align-items-end">
+            <div className="col-12 col-md-4"><label className="form-label">Reason</label><input className="form-control" value={reason} onChange={(e) => setReason(e.target.value)} /></div>
+            <div className="col-6 col-md-3"><label className="form-label">Start Date</label><input type="date" className="form-control" value={startDate} onChange={(e) => setStartDate(e.target.value)} /></div>
+            <div className="col-6 col-md-3"><label className="form-label">End Date</label><input type="date" className="form-control" value={endDate} onChange={(e) => setEndDate(e.target.value)} /></div>
+            <div className="col-12 col-md-2"><button className="btn btn-primary w-100" onClick={apply}>Apply</button></div>
+          </div>
+        </div>
       </div>
 
-      <div className="mt-4 overflow-auto rounded-xl border border-slate-200">
-        <table className="min-w-full text-sm">
-          <thead className="bg-slate-50">
-            <tr>
-              <th className="px-3 py-2 text-left">Reason</th>
-              <th className="px-3 py-2 text-left">Start</th>
-              <th className="px-3 py-2 text-left">End</th>
-              <th className="px-3 py-2 text-left">Status</th>
-            </tr>
+      <div className="table-responsive border rounded mb-4">
+        <table className="table table-striped mb-0">
+          <thead className="table-light">
+            <tr><th>Reason</th><th>Start</th><th>End</th><th>Status</th></tr>
           </thead>
           <tbody>
             {rows.map((row) => (
-              <tr key={row.id} className="border-t border-slate-200">
-                <td className="px-3 py-2">{row.reason}</td>
-                <td className="px-3 py-2">{row.start_date}</td>
-                <td className="px-3 py-2">{row.end_date}</td>
-                <td className="px-3 py-2 capitalize">{row.status}</td>
+              <tr key={row.id}>
+                <td>{row.reason}</td><td>{row.start_date}</td><td>{row.end_date}</td><td><span className={statusBadge(row.status)}>{row.status}</span></td>
               </tr>
             ))}
           </tbody>
@@ -72,32 +75,22 @@ export default function Leaves() {
       </div>
 
       {isAdmin ? (
-        <div className="mt-6">
-          <h3 className="text-lg font-semibold">All Employee Leave Requests</h3>
-          <div className="mt-3 overflow-auto rounded-xl border border-slate-200">
-            <table className="min-w-full text-sm">
-              <thead className="bg-slate-50">
-                <tr>
-                  <th className="px-3 py-2 text-left">Employee</th>
-                  <th className="px-3 py-2 text-left">Reason</th>
-                  <th className="px-3 py-2 text-left">Start</th>
-                  <th className="px-3 py-2 text-left">End</th>
-                  <th className="px-3 py-2 text-left">Status</th>
-                  <th className="px-3 py-2 text-left">Action</th>
-                </tr>
+        <>
+          <h3 className="h5">All Employee Leave Requests</h3>
+          <div className="table-responsive border rounded">
+            <table className="table table-hover mb-0">
+              <thead className="table-light">
+                <tr><th>Employee</th><th>Reason</th><th>Start</th><th>End</th><th>Status</th><th>Action</th></tr>
               </thead>
               <tbody>
                 {allRows.map((row) => (
-                  <tr key={row.leave_id} className="border-t border-slate-200">
-                    <td className="px-3 py-2">{row.employee}</td>
-                    <td className="px-3 py-2">{row.reason}</td>
-                    <td className="px-3 py-2">{row.start_date}</td>
-                    <td className="px-3 py-2">{row.end_date}</td>
-                    <td className="px-3 py-2 capitalize">{row.status}</td>
-                    <td className="px-3 py-2">
-                      <div className="flex gap-2">
-                        <button className="rounded bg-emerald-600 px-2 py-1 text-white" onClick={() => updateLeaveStatus(row.leave_id, "approved")}>Approve</button>
-                        <button className="rounded bg-rose-600 px-2 py-1 text-white" onClick={() => updateLeaveStatus(row.leave_id, "rejected")}>Reject</button>
+                  <tr key={row.leave_id}>
+                    <td>{row.employee}</td><td>{row.reason}</td><td>{row.start_date}</td><td>{row.end_date}</td>
+                    <td><span className={statusBadge(row.status)}>{row.status}</span></td>
+                    <td>
+                      <div className="btn-group btn-group-sm">
+                        <button className="btn btn-outline-success" onClick={() => updateLeaveStatus(row.leave_id, "approved")}>Approve</button>
+                        <button className="btn btn-outline-danger" onClick={() => updateLeaveStatus(row.leave_id, "rejected")}>Reject</button>
                       </div>
                     </td>
                   </tr>
@@ -105,7 +98,7 @@ export default function Leaves() {
               </tbody>
             </table>
           </div>
-        </div>
+        </>
       ) : null}
     </div>
   );

@@ -10,13 +10,18 @@ export default function Holidays() {
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold">Company Holidays</h2>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <h2 className="h4 mb-1">Company Holidays</h2>
+      <p className="text-muted">Official holiday calendar visible across the organization.</p>
+      <div className="row g-3">
         {rows.map((item) => (
-          <div key={item.id} className="rounded-xl border border-slate-200 p-4">
-            <h3 className="font-semibold">{item.name}</h3>
-            <p className="text-sm text-slate-600">{item.holiday_date}</p>
-            <p className="mt-2 text-sm text-slate-500">{item.description}</p>
+          <div key={item.id} className="col-12 col-md-6 col-xl-4">
+            <div className="card h-100">
+              <div className="card-body">
+                <h5 className="card-title mb-1">{item.name}</h5>
+                <p className="text-primary fw-semibold mb-2">{item.holiday_date}</p>
+                <p className="text-muted mb-0">{item.description}</p>
+              </div>
+            </div>
           </div>
         ))}
       </div>

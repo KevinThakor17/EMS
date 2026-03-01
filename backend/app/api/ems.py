@@ -1,4 +1,6 @@
+import os
 from datetime import date, datetime, timedelta
+from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import and_
@@ -45,7 +47,8 @@ def _assert_admin(employee: Employee) -> None:
 
 @router.get("/dashboard")
 def dashboard(current_employee: Employee = Depends(get_current_employee), db: Session = Depends(get_db)):
-    today = date.today()
+    app_timezone = os.getenv("APP_TIMEZONE", "Asia/Kolkata")
+    today = datetime.now(ZoneInfo(app_timezone)).date()
 
     today_leaves = (
         db.query(LeaveRequest, Employee)
@@ -54,7 +57,6 @@ def dashboard(current_employee: Employee = Depends(get_current_employee), db: Se
             LeaveRequest.status == "approved",
             LeaveRequest.start_date <= today,
             LeaveRequest.end_date >= today,
-            LeaveRequest.employee_id != current_employee.id,
         )
         .all()
     )
@@ -66,7 +68,6 @@ def dashboard(current_employee: Employee = Depends(get_current_employee), db: Se
             LeaveRequest.status == "approved",
             LeaveRequest.start_date > today,
             LeaveRequest.start_date <= today + timedelta(days=14),
-            LeaveRequest.employee_id != current_employee.id,
         )
         .order_by(LeaveRequest.start_date.asc())
         .all()

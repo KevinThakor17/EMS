@@ -29,38 +29,30 @@ export default function TimeLogs() {
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold">Daily Time Logs</h2>
+      <h2 className="h4 mb-1">Daily Time Logs</h2>
+      <p className="text-muted">Capture work done every day with project-level context.</p>
 
-      <div className="mt-4 grid gap-2 rounded-xl border border-slate-200 p-4 sm:grid-cols-5">
-        <select className="rounded border px-3 py-2" value={projectId} onChange={(e) => setProjectId(e.target.value)}>
-          <option value="">Select project</option>
-          {projects.map((p) => (
-            <option key={p.id} value={p.id}>{p.name}</option>
-          ))}
-        </select>
-        <input className="rounded border px-3 py-2" type="date" value={workDate} onChange={(e) => setWorkDate(e.target.value)} />
-        <input className="rounded border px-3 py-2" type="number" step="0.5" min="0" max="24" value={hours} onChange={(e) => setHours(e.target.value)} />
-        <input className="rounded border px-3 py-2 sm:col-span-2" placeholder="Work description" value={description} onChange={(e) => setDescription(e.target.value)} />
-        <button className="rounded bg-cyan-600 px-3 py-2 text-white sm:col-span-5" onClick={addLog}>Log Work</button>
+      <div className="card mb-3">
+        <div className="card-body">
+          <div className="row g-2 align-items-end">
+            <div className="col-12 col-md-3"><label className="form-label">Project</label><select className="form-select" value={projectId} onChange={(e) => setProjectId(e.target.value)}><option value="">Select project</option>{projects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></div>
+            <div className="col-6 col-md-2"><label className="form-label">Date</label><input type="date" className="form-control" value={workDate} onChange={(e) => setWorkDate(e.target.value)} /></div>
+            <div className="col-6 col-md-2"><label className="form-label">Hours</label><input type="number" step="0.5" min="0" max="24" className="form-control" value={hours} onChange={(e) => setHours(e.target.value)} /></div>
+            <div className="col-12 col-md-5"><label className="form-label">Description</label><input className="form-control" value={description} onChange={(e) => setDescription(e.target.value)} /></div>
+            <div className="col-12"><button className="btn btn-primary" onClick={addLog}>Log Work</button></div>
+          </div>
+        </div>
       </div>
 
-      <div className="mt-4 overflow-auto rounded-xl border border-slate-200">
-        <table className="min-w-full text-sm">
-          <thead className="bg-slate-50">
-            <tr>
-              <th className="px-3 py-2 text-left">Date</th>
-              <th className="px-3 py-2 text-left">Project</th>
-              <th className="px-3 py-2 text-left">Hours</th>
-              <th className="px-3 py-2 text-left">Description</th>
-            </tr>
+      <div className="table-responsive border rounded">
+        <table className="table table-striped mb-0">
+          <thead className="table-light">
+            <tr><th>Date</th><th>Project</th><th>Hours</th><th>Description</th></tr>
           </thead>
           <tbody>
             {logs.map((row) => (
-              <tr key={row.id} className="border-t border-slate-200">
-                <td className="px-3 py-2">{row.work_date}</td>
-                <td className="px-3 py-2">{row.project}</td>
-                <td className="px-3 py-2">{row.hours}</td>
-                <td className="px-3 py-2">{row.description}</td>
+              <tr key={row.id}>
+                <td>{row.work_date}</td><td>{row.project}</td><td>{row.hours}</td><td>{row.description}</td>
               </tr>
             ))}
           </tbody>

@@ -8,19 +8,21 @@ export default function Profile() {
     api.get("/ems/profile").then((res) => setProfile(res.data));
   }, []);
 
-  if (!profile) return <p>Loading profile...</p>;
+  if (!profile) return <p className="text-muted mb-0">Loading profile...</p>;
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold">Employee Profile</h2>
-      <div className="mt-4 grid gap-3 rounded-xl border border-slate-200 p-4 sm:grid-cols-2">
-        <p><span className="font-medium">Name:</span> {profile.full_name}</p>
-        <p><span className="font-medium">Email:</span> {profile.email}</p>
-        <p><span className="font-medium">Title:</span> {profile.title}</p>
-        <p><span className="font-medium">Department:</span> {profile.department}</p>
-        <p><span className="font-medium">Role:</span> {profile.role}</p>
-        <p><span className="font-medium">Manager:</span> {profile.manager || "NA"}</p>
-        <p><span className="font-medium">Joined On:</span> {profile.joined_on}</p>
+      <h2 className="h4 mb-1">Employee Profile</h2>
+      <p className="text-muted">Your official company profile and reporting structure.</p>
+
+      <div className="row g-3">
+        <div className="col-md-6"><div className="card"><div className="card-body"><small className="text-muted d-block">Name</small><div className="fw-semibold">{profile.full_name}</div></div></div></div>
+        <div className="col-md-6"><div className="card"><div className="card-body"><small className="text-muted d-block">Email</small><div className="fw-semibold">{profile.email}</div></div></div></div>
+        <div className="col-md-6"><div className="card"><div className="card-body"><small className="text-muted d-block">Title</small><div className="fw-semibold">{profile.title}</div></div></div></div>
+        <div className="col-md-6"><div className="card"><div className="card-body"><small className="text-muted d-block">Department</small><div className="fw-semibold">{profile.department}</div></div></div></div>
+        <div className="col-md-6"><div className="card"><div className="card-body"><small className="text-muted d-block">Role</small><div className="fw-semibold text-capitalize">{profile.role}</div></div></div></div>
+        <div className="col-md-6"><div className="card"><div className="card-body"><small className="text-muted d-block">Manager</small><div className="fw-semibold">{profile.manager || "NA"}</div></div></div></div>
+        <div className="col-md-6"><div className="card"><div className="card-body"><small className="text-muted d-block">Joined On</small><div className="fw-semibold">{profile.joined_on}</div></div></div></div>
       </div>
     </div>
   );

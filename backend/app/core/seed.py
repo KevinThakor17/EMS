@@ -90,14 +90,14 @@ def seed_initial_data(db: Session) -> None:
         LeaveRequest(
             employee_id=analyst.id,
             reason="Family function",
-            status="approved",
+            status="pending",
             start_date=date.today(),
             end_date=date.today() + timedelta(days=1),
         ),
         LeaveRequest(
             employee_id=dev_lead.id,
             reason="Medical appointment",
-            status="approved",
+            status="pending",
             start_date=date.today() + timedelta(days=4),
             end_date=date.today() + timedelta(days=4),
         ),

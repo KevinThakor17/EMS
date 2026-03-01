@@ -22,36 +22,47 @@ export default function Projects() {
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold">Projects and Members</h2>
+      <h2 className="h4 mb-1">Projects and Members</h2>
+      <p className="text-muted">Track active projects, teams, and allocations.</p>
+
       {canManageProjects ? (
-        <div className="mt-4 grid gap-2 rounded-xl border border-slate-200 p-4 sm:grid-cols-5">
-          <input className="rounded border px-3 py-2" placeholder="Code" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} />
-          <input className="rounded border px-3 py-2" placeholder="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-          <input className="rounded border px-3 py-2 sm:col-span-2" placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-          <input className="rounded border px-3 py-2" type="date" value={form.start_date} onChange={(e) => setForm({ ...form, start_date: e.target.value })} />
-          <input className="rounded border px-3 py-2" type="date" value={form.end_date} onChange={(e) => setForm({ ...form, end_date: e.target.value })} />
-          <button className="rounded bg-cyan-600 px-3 py-2 text-white sm:col-span-5" onClick={createProject}>Create Project</button>
+        <div className="card mb-3">
+          <div className="card-body">
+            <div className="row g-2 align-items-end">
+              <div className="col-12 col-md-2"><label className="form-label">Code</label><input className="form-control" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} /></div>
+              <div className="col-12 col-md-3"><label className="form-label">Name</label><input className="form-control" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
+              <div className="col-12 col-md-3"><label className="form-label">Description</label><input className="form-control" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
+              <div className="col-6 col-md-2"><label className="form-label">Start</label><input type="date" className="form-control" value={form.start_date} onChange={(e) => setForm({ ...form, start_date: e.target.value })} /></div>
+              <div className="col-6 col-md-2"><label className="form-label">End</label><input type="date" className="form-control" value={form.end_date} onChange={(e) => setForm({ ...form, end_date: e.target.value })} /></div>
+              <div className="col-12"><button className="btn btn-primary" onClick={createProject}>Create Project</button></div>
+            </div>
+          </div>
         </div>
       ) : null}
-      <div className="mt-4 space-y-4">
-        {projects.map((project) => (
-          <div key={project.id} className="rounded-xl border border-slate-200 p-4">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="text-lg font-semibold">{project.name}</h3>
-              <span className="rounded bg-slate-100 px-2 py-1 text-xs">{project.code}</span>
-            </div>
-            <p className="mt-2 text-sm text-slate-600">{project.description}</p>
-            <p className="mt-1 text-xs text-slate-500">Status: {project.status}</p>
 
-            <div className="mt-3">
-              <p className="text-sm font-medium">Project Members</p>
-              <ul className="mt-2 space-y-1 text-sm text-slate-700">
-                {project.members.map((member) => (
-                  <li key={`${project.id}-${member.employee_id}`} className="rounded bg-slate-50 px-2 py-1">
-                    {member.employee_name} ({member.allocation_percent}%)
-                  </li>
-                ))}
-              </ul>
+      <div className="row g-3">
+        {projects.map((project) => (
+          <div key={project.id} className="col-12">
+            <div className="card">
+              <div className="card-body">
+                <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                  <h5 className="mb-0">{project.name}</h5>
+                  <span className="badge text-bg-secondary">{project.code}</span>
+                </div>
+                <p className="text-muted mt-2 mb-1">{project.description}</p>
+                <small className="text-secondary">Status: {project.status}</small>
+
+                <div className="mt-3">
+                  <h6>Project Members</h6>
+                  <div className="row g-2">
+                    {project.members.map((member) => (
+                      <div key={`${project.id}-${member.employee_id}`} className="col-12 col-md-6 col-xl-4">
+                        <div className="border rounded p-2 bg-light">{member.employee_name} ({member.allocation_percent}%)</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         ))}

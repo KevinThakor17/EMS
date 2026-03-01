@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { api } from "../lib/api";
 import { readEmployee } from "../lib/auth";
+import { useToast } from "../components/ToastProvider";
 
 export default function Projects() {
   const current = readEmployee();
   const canManageProjects = current?.role === "admin" || current?.role === "manager";
+  const toast = useToast();
   const [projects, setProjects] = useState([]);
   const [form, setForm] = useState({ code: "", name: "", description: "", start_date: "", end_date: "" });
 
@@ -15,9 +17,14 @@ export default function Projects() {
   }, []);
 
   const createProject = async () => {
-    await api.post("/ems/projects", form);
-    setForm({ code: "", name: "", description: "", start_date: "", end_date: "" });
-    refresh();
+    try {
+      await api.post("/ems/projects", form);
+      setForm({ code: "", name: "", description: "", start_date: "", end_date: "" });
+      await refresh();
+      toast.success("Project created successfully.", { title: "Project" });
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || "Failed to create project.", { title: "Project" });
+    }
   };
 
   return (

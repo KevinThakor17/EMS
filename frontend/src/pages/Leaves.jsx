@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { api } from "../lib/api";
 import { readEmployee } from "../lib/auth";
+import { useToast } from "../components/ToastProvider";
 
 const statusBadge = (status) => {
   if (status === "approved") return "badge text-bg-success";
@@ -11,6 +12,7 @@ const statusBadge = (status) => {
 export default function Leaves() {
   const current = readEmployee();
   const isAdmin = current?.role === "admin";
+  const toast = useToast();
   const [rows, setRows] = useState([]);
   const [allRows, setAllRows] = useState([]);
   const [reason, setReason] = useState("");
@@ -31,16 +33,26 @@ export default function Leaves() {
   }, []);
 
   const apply = async () => {
-    await api.post("/ems/leaves", { reason, start_date: startDate, end_date: endDate });
-    setReason("");
-    setStartDate("");
-    setEndDate("");
-    refresh();
+    try {
+      await api.post("/ems/leaves", { reason, start_date: startDate, end_date: endDate });
+      setReason("");
+      setStartDate("");
+      setEndDate("");
+      await refresh();
+      toast.success("Leave request submitted.", { title: "Leave" });
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || "Failed to submit leave request.", { title: "Leave" });
+    }
   };
 
   const updateLeaveStatus = async (leaveId, status) => {
-    await api.put(`/ems/leaves/${leaveId}`, { status });
-    refresh();
+    try {
+      await api.put(`/ems/leaves/${leaveId}`, { status });
+      await refresh();
+      toast.success(`Leave ${status}.`, { title: "Leave Review" });
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || "Failed to update leave status.", { title: "Leave Review" });
+    }
   };
 
   return (

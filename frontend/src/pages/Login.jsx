@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
 import { saveSession } from "../lib/auth";
+import { useToast } from "../components/ToastProvider";
 import { applyTheme, getSavedTheme, toggleTheme } from "../lib/theme";
 
 export default function Login() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [email, setEmail] = useState("employee@company.com");
   const [password, setPassword] = useState("employee123");
   const [error, setError] = useState("");
@@ -22,9 +24,12 @@ export default function Login() {
     try {
       const { data } = await api.post("/auth/login", { email, password });
       saveSession(data);
+      toast.success("Logged in successfully.", { title: "Authentication" });
       navigate("/dashboard");
     } catch (err) {
-      setError(err?.response?.data?.detail || "Unable to login");
+      const message = err?.response?.data?.detail || "Unable to login";
+      setError(message);
+      toast.error(message, { title: "Authentication" });
     } finally {
       setLoading(false);
     }

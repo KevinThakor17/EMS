@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { api } from "../lib/api";
 import { readEmployee } from "../lib/auth";
+import { useToast } from "../components/ToastProvider";
 
 const EMPTY_EMPLOYEE = {
   email: "",
@@ -16,6 +17,7 @@ const EMPTY_EMPLOYEE = {
 export default function Admin() {
   const current = readEmployee();
   const isAdmin = current?.role === "admin";
+  const toast = useToast();
   const [employees, setEmployees] = useState([]);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -55,43 +57,63 @@ export default function Admin() {
   };
 
   const saveEmployee = async (employee) => {
-    const payload = {
-      full_name: employee.full_name,
-      title: employee.title,
-      department: employee.department,
-      role: employee.role,
-      manager_id: employee.manager_id === "" ? null : Number(employee.manager_id),
-      is_active: employee.is_active,
-    };
-    await api.put(`/ems/admin/employees/${employee.id}`, payload);
-    await loadData();
+    try {
+      const payload = {
+        full_name: employee.full_name,
+        title: employee.title,
+        department: employee.department,
+        role: employee.role,
+        manager_id: employee.manager_id === "" ? null : Number(employee.manager_id),
+        is_active: employee.is_active,
+      };
+      await api.put(`/ems/admin/employees/${employee.id}`, payload);
+      await loadData();
+      toast.success("Employee updated.", { title: "Admin" });
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || "Failed to update employee.", { title: "Admin" });
+    }
   };
 
   const createEmployee = async () => {
-    const payload = { ...newEmployee, manager_id: newEmployee.manager_id === "" ? null : Number(newEmployee.manager_id) };
-    await api.post("/ems/admin/employees", payload);
-    setNewEmployee(EMPTY_EMPLOYEE);
-    await loadData();
+    try {
+      const payload = { ...newEmployee, manager_id: newEmployee.manager_id === "" ? null : Number(newEmployee.manager_id) };
+      await api.post("/ems/admin/employees", payload);
+      setNewEmployee(EMPTY_EMPLOYEE);
+      await loadData();
+      toast.success("Employee created.", { title: "Admin" });
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || "Failed to create employee.", { title: "Admin" });
+    }
   };
 
   const assignProjectMember = async () => {
-    await api.post(`/ems/projects/${Number(assignment.project_id)}/members`, {
-      employee_id: Number(assignment.employee_id),
-      allocation_percent: Number(assignment.allocation_percent),
-    });
-    setAssignment({ project_id: "", employee_id: "", allocation_percent: 100 });
-    await loadData();
+    try {
+      await api.post(`/ems/projects/${Number(assignment.project_id)}/members`, {
+        employee_id: Number(assignment.employee_id),
+        allocation_percent: Number(assignment.allocation_percent),
+      });
+      setAssignment({ project_id: "", employee_id: "", allocation_percent: 100 });
+      await loadData();
+      toast.success("Employee assigned to project.", { title: "Admin" });
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || "Failed to assign employee to project.", { title: "Admin" });
+    }
   };
 
   const createLeaveForEmployee = async () => {
-    await api.post("/ems/admin/leaves", {
-      employee_id: Number(adminLeave.employee_id),
-      reason: adminLeave.reason,
-      start_date: adminLeave.start_date,
-      end_date: adminLeave.end_date,
-      status: adminLeave.status,
-    });
-    setAdminLeave({ employee_id: "", reason: "", start_date: "", end_date: "", status: "approved" });
+    try {
+      await api.post("/ems/admin/leaves", {
+        employee_id: Number(adminLeave.employee_id),
+        reason: adminLeave.reason,
+        start_date: adminLeave.start_date,
+        end_date: adminLeave.end_date,
+        status: adminLeave.status,
+      });
+      setAdminLeave({ employee_id: "", reason: "", start_date: "", end_date: "", status: "approved" });
+      toast.success("Leave created for employee.", { title: "Admin" });
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || "Failed to create leave for employee.", { title: "Admin" });
+    }
   };
 
   return (

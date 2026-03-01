@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { api } from "../lib/api";
+import { useToast } from "../components/ToastProvider";
 
 export default function TimeLogs() {
+  const toast = useToast();
   const [projects, setProjects] = useState([]);
   const [logs, setLogs] = useState([]);
   const [projectId, setProjectId] = useState("");
@@ -17,14 +19,19 @@ export default function TimeLogs() {
   }, []);
 
   const addLog = async () => {
-    await api.post("/ems/time-logs", {
-      project_id: Number(projectId),
-      work_date: workDate,
-      hours: Number(hours),
-      description,
-    });
-    setDescription("");
-    refreshLogs();
+    try {
+      await api.post("/ems/time-logs", {
+        project_id: Number(projectId),
+        work_date: workDate,
+        hours: Number(hours),
+        description,
+      });
+      setDescription("");
+      await refreshLogs();
+      toast.success("Work log added.", { title: "Time Log" });
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || "Failed to add work log.", { title: "Time Log" });
+    }
   };
 
   return (

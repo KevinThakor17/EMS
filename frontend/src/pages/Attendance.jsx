@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { api } from "../lib/api";
+import { useToast } from "../components/ToastProvider";
 
 export default function Attendance() {
   const [rows, setRows] = useState([]);
+  const toast = useToast();
 
   const refresh = () => api.get("/ems/attendance").then((res) => setRows(res.data));
 
@@ -11,13 +13,23 @@ export default function Attendance() {
   }, []);
 
   const markCheckIn = async () => {
-    await api.post("/ems/attendance/check-in", { status: "present" });
-    refresh();
+    try {
+      await api.post("/ems/attendance/check-in", { status: "present" });
+      await refresh();
+      toast.success("Check-in marked successfully.", { title: "Attendance" });
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || "Failed to mark check-in.", { title: "Attendance" });
+    }
   };
 
   const markCheckOut = async () => {
-    await api.post("/ems/attendance/check-out");
-    refresh();
+    try {
+      await api.post("/ems/attendance/check-out");
+      await refresh();
+      toast.success("Check-out marked successfully.", { title: "Attendance" });
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || "Failed to mark check-out.", { title: "Attendance" });
+    }
   };
 
   return (

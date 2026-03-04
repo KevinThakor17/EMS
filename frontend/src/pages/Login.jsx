@@ -39,38 +39,54 @@ export default function Login() {
     <div className="min-vh-100 d-flex align-items-center bg-body-tertiary">
       <div className="container">
         <div className="row justify-content-center">
-          <div className="col-12 col-md-10 col-lg-8 col-xl-6">
-            <div className="card shadow border-0">
-              <div className="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
-                <div className="d-flex align-items-center gap-2">
-                  <div className="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center" style={{ width: 34, height: 34 }}>
-                    <i className="bi bi-buildings"></i>
-                  </div>
+          <div className="col-12 col-md-11 col-lg-10 col-xl-9">
+            <div className="card border-0 shadow-sm overflow-hidden">
+              <div className="row g-0">
+                <div className="col-12 col-lg-5 bg-primary text-white p-4 d-flex flex-column justify-content-between">
                   <div>
-                    <h4 className="mb-0">Employee Management System</h4>
-                    <small className="opacity-75">Sign in to continue</small>
+                    <div className="workspace-logo mb-3 bg-white text-primary"><i className="bi bi-command"></i></div>
+                    <h3 className="h4">Pulse Workspace</h3>
+                    <p className="opacity-75 mb-0">A smarter employee experience for attendance, leave, project flow, and team operations.</p>
+                  </div>
+                  <div className="small opacity-75 mt-4">
+                    Demo users: employee@company.com / employee123<br />
+                    lead@company.com / lead123<br />
+                    admin@company.com / admin123
                   </div>
                 </div>
-                <button className="btn btn-sm btn-outline-light" onClick={() => setTheme((prev) => toggleTheme(prev))}>
-                  <i className={`bi ${theme === "dark" ? "bi-sun" : "bi-moon-stars"}`}></i>
-                </button>
-              </div>
-              <div className="card-body p-4">
-                <div className="mb-3">
-                  <label className="form-label"><i className="bi bi-envelope me-2"></i>Email</label>
-                  <input className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label"><i className="bi bi-key me-2"></i>Password</label>
-                  <input type="password" className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} />
-                </div>
-                {error ? <div className="alert alert-danger py-2">{error}</div> : null}
-                <button className="btn btn-primary w-100" onClick={onLogin} disabled={loading}>
-                  {loading ? "Signing in..." : "Login"}
-                </button>
 
-                <div className="mt-3 small text-muted">
-                  Demo users: employee@company.com / employee123, lead@company.com / lead123, admin@company.com / admin123
+                <div className="col-12 col-lg-7 p-4 p-md-5">
+                  <div className="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                      <h4 className="mb-0">Sign In</h4>
+                      <small className="text-muted">Continue to your workspace</small>
+                    </div>
+                    <button className="btn btn-sm btn-outline-secondary" onClick={() => setTheme((prev) => toggleTheme(prev))}>
+                      <i className={`bi ${theme === "dark" ? "bi-sun" : "bi-moon-stars"}`}></i>
+                    </button>
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label">Email</label>
+                    <div className="input-group">
+                      <span className="input-group-text"><i className="bi bi-envelope"></i></span>
+                      <input className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    </div>
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label">Password</label>
+                    <div className="input-group">
+                      <span className="input-group-text"><i className="bi bi-key"></i></span>
+                      <input type="password" className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} />
+                    </div>
+                  </div>
+
+                  {error ? <div className="alert alert-danger py-2">{error}</div> : null}
+
+                  <button className="btn btn-primary w-100" onClick={onLogin} disabled={loading}>
+                    {loading ? "Signing in..." : "Access Workspace"}
+                  </button>
                 </div>
               </div>
             </div>
